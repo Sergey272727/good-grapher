@@ -13,10 +13,8 @@ import PlotCanvas from "@/components/PlotCanvas.vue";
           <aside class="toolbar">
               <div class="toolbar__label"></div>
               <div class="toolbar__upper">
-                  <DataSelectionBox></DataSelectionBox>
               </div>
               <div class="toolbar__lower">
-                  <PlotTypeBox></PlotTypeBox>
               </div>
           </aside>
       </div>
