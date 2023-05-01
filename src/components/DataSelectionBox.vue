@@ -6,7 +6,7 @@ export default {
 
 <template>
     <div class="data-selection-box">
-        <div class="data-selection-box__button">
+        <div v-if="dataButton" class="data-selection-box__button">
             <div class="data-selection-box__button__text">Данные</div>
             <input type="file" class="file-input">
         </div>
