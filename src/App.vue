@@ -16,11 +16,14 @@ export default {
     },
     methods: {
         simulateClickOnInput() {
-            document.querySelector('.file-input').click();
+            this.$refs['file-input'].click();
         },
-        onInputChange(e) {
+        simulateClickOnSelect(){
+            this.$refs.graph_type_select;
+        },
+        onInputChange() {
             const reader = new FileReader();
-            const pointInFile = document.querySelector('.file-input').files[0];
+            const pointInFile = this.$refs['file-input'].files[0];
             if (pointInFile) {
                 reader.readAsText(pointInFile);
                 reader.onload = () => {
@@ -56,16 +59,16 @@ export default {
                             <div class="toolbar__data-button-text">
                                 <span>Данные</span>
                             </div>
-                            <input @change="onInputChange($event)" type="file" class="file-input">
+                            <input @change="onInputChange()" type="file" class="file-input" ref="file-input">
                         </div>
                         <div class="toolbar__upper-text">
                             {{ file }}
                         </div>
                     </div>
                     <div class="toolbar__lower">
-                        <div class="toolbar__button" @click="document.querySelector('.graph-type-select').focus()">
+                        <div class="toolbar__button" @click="simulateClickOnSelect">
                             <div class="toolbar__graph-type-button-text">
-                                <select class="graph-type-select toolbar__button">
+                                <select class="graph-type-select" ref="graph_type_select" >
                                     <option class="graph-type-option" value="">Тип графика</option>
                                     <option class="graph-type-option" value="2d">2D</option>
                                     <option class="graph-type-option" value="3d">3D</option>
@@ -112,16 +115,19 @@ export default {
 }
 
 .toolbar {
-    display: flex;
-    flex-direction: column;
+
     width: 20%;
-    max-height: 100%;
+    height: 100vh;
     background-color: white;
     border: 1px solid #D9D9D9;
     border-radius: 1.25rem 0 0 1.25rem;
+
 }
 
 .toolbar_container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
     width: 90%;
     margin: 1.5rem auto;
 }
@@ -146,7 +152,7 @@ export default {
     flex-direction: row;
     justify-content: left;
     align-items: center;
-    color: white;
+    color: #fff;
     font-size: 2rem;
 }
 
@@ -209,19 +215,7 @@ export default {
     border-radius: 1.25rem;
 }
 
-.graph-type-option {
-    all: unset;
-    background-color: #00A537;
-    border: none;
-    color: #fff;
-    border-radius: 20px;
-}
-
-.graph-type-option:hover {
-    background-color: #6BAE7A;
-}
-
-.graph-type-select {
+.graph-type-select{
     all: unset;
     background-color: inherit;
     color: #fff;
@@ -229,10 +223,19 @@ export default {
     font-family: inherit;
     border-radius: 20px;
 }
-
+.graph-type-option {
+    all: unset;
+    background-color: #00A537;
+    border: none;
+    color: #fff;
+    border-radius: 20px;
+}
 .graph-type-option::before {
     padding-right: 1.5rem;
     padding-left: 1rem;
     content: url("assets/img/arrow.svg");
+}
+.graph-type-option:hover {
+    background-color: #6BAE7A;
 }
 </style>
