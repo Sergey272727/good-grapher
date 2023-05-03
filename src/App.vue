@@ -2,10 +2,11 @@
 
 
 import Plotter from "@/components/Plotter.vue";
-
+import DropDown from "@/components/DropDown.vue";
+import { NSelect } from "naive-ui"
 export default {
     name: "App",
-    components: {Plotter},
+    components: {Plotter, DropDown, NSelect},
     data() {
         return {
             points: [],
@@ -19,7 +20,7 @@ export default {
             this.$refs['file-input'].click();
         },
         simulateClickOnSelect(){
-            this.$refs.graph_type_select;
+            this.$refs.graph_type_select.up();
         },
         onInputChange() {
             const reader = new FileReader();
@@ -55,27 +56,16 @@ export default {
                         <span>Меню</span>
                     </div>
                     <div class="toolbar__upper">
-                        <div class="toolbar__button" @click="simulateClickOnInput">
-                            <div class="toolbar__data-button-text">
-                                <span>Данные</span>
-                            </div>
+                        <button class="toolbar__button" @click="simulateClickOnInput">
+                            <span class="toolbar__data-button-text">Данные</span>
                             <input @change="onInputChange()" type="file" class="file-input" ref="file-input">
-                        </div>
+                        </button>
                         <div class="toolbar__upper-text">
                             {{ file }}
                         </div>
                     </div>
                     <div class="toolbar__lower">
-                        <div class="toolbar__button" @click="simulateClickOnSelect">
-                            <div class="toolbar__graph-type-button-text">
-                                <select class="graph-type-select" ref="graph_type_select" >
-                                    <option class="graph-type-option" value="">Тип графика</option>
-                                    <option class="graph-type-option" value="2d">2D</option>
-                                    <option class="graph-type-option" value="3d">3D</option>
-                                    <option class="graph-type-option" value="4d">4D</option>
-                                </select>
-                            </div>
-                        </div>
+                        <drop-down></drop-down>
                         <div class="toolbar__lower-example">
                             <img class="dasha" src="src/assets/img/dasha.jpg" alt="preview">
                         </div>
@@ -154,6 +144,9 @@ export default {
     align-items: center;
     color: #fff;
     font-size: 2rem;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    border: none;
+    cursor: pointer;
 }
 
 .toolbar__button:hover {
@@ -172,18 +165,6 @@ export default {
 .toolbar__data-button-text::before {
     padding-right: 1.5rem;
     padding-left: 1rem;
-    content: url("assets/img/arrow.svg");
-}
-
-.toolbar__graph-type-button-text {
-    display: flex;
-}
-
-.toolbar__graph-type-button-text::before {
-    padding-right: 1.5rem;
-    padding-left: 1rem;
-    display: inline-block;
-    transform: rotate(90deg);
     content: url("assets/img/arrow.svg");
 }
 
@@ -213,29 +194,5 @@ export default {
     height: 100%;
     width: 100%;
     border-radius: 1.25rem;
-}
-
-.graph-type-select{
-    all: unset;
-    background-color: inherit;
-    color: #fff;
-    font-size: 2rem;
-    font-family: inherit;
-    border-radius: 20px;
-}
-.graph-type-option {
-    all: unset;
-    background-color: #00A537;
-    border: none;
-    color: #fff;
-    border-radius: 20px;
-}
-.graph-type-option::before {
-    padding-right: 1.5rem;
-    padding-left: 1rem;
-    content: url("assets/img/arrow.svg");
-}
-.graph-type-option:hover {
-    background-color: #6BAE7A;
 }
 </style>

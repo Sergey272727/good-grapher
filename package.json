@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "naive-ui": "^2.34.3",
     "plotly.js-dist-min": "^2.22.0",
     "vue": "^3.2.47"
   },

@@ -8,11 +8,18 @@ export default {
             data: [{
                 x: [1, 2, 3, 4],
                 y: [10, 15, 13, 17],
-                mode: 'markers',
+                mode: "lines+markers",
+                line: {shape: "spline"},
                 type: "scatter"
             }],
             layout: {
                 title: "My graph",
+                xaxis: {
+                    title: 'X'
+                },
+                yaxis: {
+                    title: 'Y'
+                },
                 width: 1000,
                 height: 1000,
                 margin: {
