@@ -51,8 +51,7 @@ export default {
                 let y = Math.floor((obj.y[i] - minY)/dy/width);
                 x = x >= width ? width - 1 : x;
                 y = y >= height ? height - 1 : y;
-                const z = obj.z[i];
-                matrix[y][x] = z;
+                matrix[y][x] = obj.z[i];
             }
 
             return matrix;
@@ -155,7 +154,6 @@ export default {
                     break;
                 }
                 case 'hm': {
-                    const inputObj = { x: [0.5, 1.5, 2.3], y: [1.2, 2.8, 0.4], z: [10, 20, 30] };
                     data.z = this.convertToMatrix(data);
                     data.x = [... new Set(data.x)]
                     data.y = [... new Set(data.y)];
