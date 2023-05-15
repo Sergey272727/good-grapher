@@ -3,16 +3,36 @@ import Plotly from 'plotly.js-dist-min'
 
 export default {
     name: "Plotter",
+    props: {
+        plotterData: {
+            default: {
+                x: [1, 2, 3, 4],
+                y: [-10, -15, -13, -17],
+                mode: "lines+markers",
+                line: {shape: "spline"},
+                type: "scatter"
+            }
+        }
+    },
     data() {
         return {
             data: [{
                 x: [1, 2, 3, 4],
                 y: [10, 15, 13, 17],
-                mode: 'markers',
+                mode: "lines+markers",
+                line: {shape: "spline"},
                 type: "scatter"
             }],
             layout: {
-                title: "My graph",
+                xaxis: {
+                    title: 'X'
+                },
+                yaxis: {
+                    title: 'Y'
+                },
+                zaxis: {
+                    title: 'Z'
+                },
                 width: 1000,
                 height: 1000,
                 margin: {
@@ -28,7 +48,8 @@ export default {
             config: {
                 scrollZoom: true,
                 displaylogo: false,
-                responsive: true
+                responsive: true,
+                willReadFrequently: true
             }
         }
     },
@@ -51,6 +72,13 @@ export default {
         calculateGraphSize() {
             this.layout.width = this.$refs.graphBox.clientWidth - 10;
             this.layout.height = this.$refs.graphBox.clientHeight - 10;
+        }
+
+    },
+    watch: {
+        plotterData() {
+            this.data[0] = this.plotterData;
+            this.buildGraph();
         }
     }
 }
