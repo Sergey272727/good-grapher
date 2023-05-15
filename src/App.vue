@@ -3,11 +3,10 @@
 
 import Plotter from "@/components/Plotter.vue";
 import DropDown from "@/components/DropDown.vue";
-import {NSelect} from "naive-ui"
 
 export default {
     name: "App",
-    components: {Plotter, DropDown, NSelect},
+    components: {Plotter, DropDown},
     data() {
         return {
             points: {
@@ -39,16 +38,16 @@ export default {
             const maxX = Math.max(...obj.x);
             const maxY = Math.max(...obj.y);
 
-            const width = [... new Set(obj.x)].length;
-            const height = [... new Set(obj.y)].length;
+            const width = [...new Set(obj.x)].length;
+            const height = [...new Set(obj.y)].length;
             const dx = (maxX - minX) / obj.x.length;
             const dy = (maxY - minY) / obj.y.length;
 
-            const matrix = new Array(height).fill(null).map(() => new Array(width).fill(0));
+            const matrix = new Array(height).fill(null).map(() => new Array(width).fill(null));
 
             for (let i = 0; i < obj.x.length; i++) {
-                let x = Math.floor((obj.x[i] - minX)/dx/height);
-                let y = Math.floor((obj.y[i] - minY)/dy/width);
+                let x = Math.floor((obj.x[i] - minX) / dx / height);
+                let y = Math.floor((obj.y[i] - minY) / dy / width);
                 x = x >= width ? width - 1 : x;
                 y = y >= height ? height - 1 : y;
                 matrix[y][x] = obj.z[i];
@@ -78,14 +77,15 @@ export default {
                         z: [],
                     };
                     pointsArray.forEach(value => {
-                        value[0] ? dataArray.x.push(value[0]) : dataArray.x.push(0);
-                        value[1] ? dataArray.y.push(value[1]) : dataArray.y.push(0);
-                        value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(0);
+                        value[0] ? dataArray.x.push(value[0]) : dataArray.x.push(null);
+                        value[1] ? dataArray.y.push(value[1]) : dataArray.y.push(null);
+                        value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(null);
                     })
                     this.points = dataArray;
                 }
             }
-        },
+        }
+        ,
     },
     computed: {
         plotterData() {
@@ -155,22 +155,16 @@ export default {
                 }
                 case 'hm': {
                     data.z = this.convertToMatrix(data);
-                    data.x = [... new Set(data.x)]
-                    data.y = [... new Set(data.y)];
+                    data.x = [...new Set(data.x)];
+                    data.y = [...new Set(data.y)];
                     data.type = 'heatmap';
                     break;
                 }
                 case 'surface': {
                     data.z = this.convertToMatrix(data);
+                    data.x = [...new Set(data.x)];
+                    data.y = [...new Set(data.y)];
                     data.type = 'surface';
-                    data.contours = {
-                        z: {
-                            show: true,
-                            usecolormap: true,
-                            highlightcolor: "#42f462",
-                            project: {z: true}
-                        }
-                    };
                     break;
                 }
                 default: {
@@ -179,7 +173,6 @@ export default {
                     data.type = "scatter";
                 }
             }
-            console.log(data);
             return data;
         },
         graphTypeOptions() {
@@ -198,9 +191,10 @@ export default {
                     options = [
                         {key: 'scatter3d', name: 'Точечный график'},
                         {key: 'countour', name: 'График изолиний'},
-                        {key: 'mesh3d', name: 'График поверхности'},
+                        {key: 'mesh3d', name: 'Объектный график'},
                         {key: 'line3d', name: 'Линейный график'},
-                        {key: 'hm', name: 'Тепловая карта'}
+                        {key: 'hm', name: 'Тепловая карта'},
+                        {key: 'surface', name: 'График поверхности'}
                     ];
                     break;
                 }
@@ -215,10 +209,55 @@ export default {
             }
             return options;
         }
-    },
+    }
+    ,
     watch: {
-        points() {
-
+        graphType() {
+            switch (this.graphType) {
+                case 'scatter': {
+                    this.$refs.exampleImage.src = 'src/assets/img/line-and-scatter.jpg';
+                    break;
+                }
+                case 'line': {
+                    this.$refs.exampleImage.src = 'src/assets/img/line-plots.jpg';
+                    break;
+                }
+                case 'bar': {
+                    this.$refs.exampleImage.src = 'src/assets/img/bar.jpg';
+                    break;
+                }
+                case "spline": {
+                    this.$refs.exampleImage.src = 'src/assets/img/error-cont.jpg';
+                    break;
+                }
+                case "scatter3d": {
+                    this.$refs.exampleImage.src = 'src/assets/img/3d-scatter.jpg';
+                    break;
+                }
+                case "countour": {
+                    this.$refs.exampleImage.src = 'src/assets/img/contour.jpg';
+                    break;
+                }
+                case "mesh3d": {
+                    this.$refs.exampleImage.src = 'src/assets/img/3d-mesh.jpg';
+                    break;
+                }
+                case "line3d": {
+                    this.$refs.exampleImage.src = 'src/assets/img/3d-line.jpg';
+                    break;
+                }
+                case 'hm': {
+                    this.$refs.exampleImage.src = 'src/assets/img/heatmap.jpg';
+                    break;
+                }
+                case 'surface': {
+                    this.$refs.exampleImage.src = 'src/assets/img/3d-surface.jpg';
+                    break;
+                }
+                default: {
+                    this.$refs.exampleImage.src = 'src/assets/img/error-cont.jpg';
+                }
+            }
         }
     }
 }
@@ -246,20 +285,22 @@ export default {
                     </div>
                     <div class="toolbar__lower">
                         <drop-down
-                                element-name="Размерность"
-                                :options="[
-                                    {key: '2D', name: 'Двумерный график'},
-                                    {key: '3D', name: 'Трехмерный график'},
-                                ]"
-                                @change-option="changeGraphDimHandler"
+                            class="dropdown-button"
+                            element-name="Размерность"
+                            :options="[
+                                {key: '2D', name: 'Двумерный график'},
+                                {key: '3D', name: 'Трехмерный график'},
+                            ]"
+                            @change-option="changeGraphDimHandler"
                         ></drop-down>
                         <drop-down
-                                element-name="Тип графика"
-                                :options="graphTypeOptions"
-                                @change-option="changeGraphTypeHandler"
+                            element-name="Тип графика"
+                            :options="graphTypeOptions"
+                            @change-option="changeGraphTypeHandler"
                         ></drop-down>
                         <div class="toolbar__lower-example">
-                            <img class="dasha" src="src/assets/img/dasha.jpg" alt="preview">
+                            <div class="title">Пример графика</div>
+                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/dasha.jpg" alt="preview">
                         </div>
                     </div>
                 </div>
@@ -379,13 +420,17 @@ export default {
     padding-top: 3.188rem;
     height: 100%;
     width: 100%;
+    font-size: 2rem;
     border-radius: 1.25rem;
 }
 
-.dasha {
+.graph-example__image {
     object-fit: cover;
     height: 100%;
     width: 100%;
     border-radius: 1.25rem;
+}
+.dropdown-button {
+    margin-bottom: 5rem;
 }
 </style>

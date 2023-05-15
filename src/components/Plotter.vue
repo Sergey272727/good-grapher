@@ -24,12 +24,14 @@ export default {
                 type: "scatter"
             }],
             layout: {
-                title: "My graph",
                 xaxis: {
                     title: 'X'
                 },
                 yaxis: {
                     title: 'Y'
+                },
+                zaxis: {
+                    title: 'Z'
                 },
                 width: 1000,
                 height: 1000,
