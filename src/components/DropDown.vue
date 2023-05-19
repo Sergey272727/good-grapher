@@ -46,7 +46,7 @@ export default {
         'elementName': {
             type: String,
             required: false,
-            default: 'Тип графика'
+            default: 'Option'
         }
     },
     data() {
