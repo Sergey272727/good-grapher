@@ -52,12 +52,12 @@ export default {
                 y = y >= height ? height - 1 : y;
                 matrix[y][x] = obj.z[i];
             }
-
             return matrix;
         },
         read3D() {
             const reader = new FileReader();
             const pointInFile = this.$refs['file-input'].files[0];
+            this.file = pointInFile.name;
             const mainDelimiter = '\r';
             const subDelimiter = ' ';
             const regExp = new RegExp(/\D /, 'g');
@@ -70,6 +70,9 @@ export default {
                     file = file.replaceAll(',', '.');
                     let pointsArray = file.split(mainDelimiter);
                     pointsArray = pointsArray.map(stroke => stroke.split(subDelimiter).map(str => +str));
+                    if(!pointsArray[pointsArray.length - 1][0]) {
+                        pointsArray.pop();
+                    }
                     this.pointsArray = pointsArray;
                     let dataArray = {
                         x: [],
@@ -300,7 +303,7 @@ export default {
                         ></drop-down>
                         <div class="toolbar__lower-example">
                             <div class="title">Пример графика</div>
-                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/dasha.jpg" alt="preview">
+                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/line-plots.jpg" alt="preview">
                         </div>
                     </div>
                 </div>
@@ -392,6 +395,7 @@ export default {
 
 .toolbar__upper-text {
     padding-top: 2.25rem;
+    font-size: 1.75rem;
     padding-bottom: 3.125rem;
 }
 
@@ -431,6 +435,6 @@ export default {
     border-radius: 1.25rem;
 }
 .dropdown-button {
-    margin-bottom: 5rem;
+    margin-bottom: 3rem;
 }
 </style>
