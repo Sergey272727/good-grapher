@@ -10,8 +10,8 @@ export default {
     data() {
         return {
             points: {
-                x: [1, 2, 3, 4],
-                y: [-10, -15, -13, -17]
+                x: [],
+                y: []
             },
             pointsArray: [],
             graphType: '',
@@ -25,6 +25,7 @@ export default {
         },
         changeGraphDimHandler(graphDim) {
             this.graphDim = graphDim;
+            this.$refs.graphTypeDropDown.selectedOption = this.$refs.graphTypeDropDown.options[0];
         },
         simulateClickOnInput() {
             this.$refs['file-input'].click();
@@ -80,9 +81,9 @@ export default {
                         z: [],
                     };
                     pointsArray.forEach(value => {
-                        value[0] ? dataArray.x.push(value[0]) : dataArray.x.push(null);
-                        value[1] ? dataArray.y.push(value[1]) : dataArray.y.push(null);
-                        value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(null);
+                        value[0] ? dataArray.x.push(value[0]) : dataArray.x.push(0);
+                        value[1] ? dataArray.y.push(value[1]) : dataArray.y.push(0);
+                        value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(0);
                     })
                     this.points = dataArray;
                 }
@@ -297,6 +298,7 @@ export default {
                             @change-option="changeGraphDimHandler"
                         ></drop-down>
                         <drop-down
+                            ref="graphTypeDropDown"
                             element-name="Тип графика"
                             :options="graphTypeOptions"
                             @change-option="changeGraphTypeHandler"
@@ -429,6 +431,7 @@ export default {
 }
 
 .graph-example__image {
+    padding: 1.25rem;
     object-fit: cover;
     height: 100%;
     width: 100%;
