@@ -5,13 +5,14 @@ export default {
     name: "Plotter",
     props: {
         plotterData: {
-            default: {
+            type: Array,
+            default: [{
                 x: [],
                 y: [],
                 mode: "lines+markers",
                 line: {shape: "spline"},
                 type: "scatter"
-            }
+            }]
         }
     },
     data() {
@@ -77,7 +78,7 @@ export default {
     },
     watch: {
         plotterData() {
-            this.data[0] = this.plotterData;
+            this.data = this.plotterData;
             this.buildGraph();
         }
     }
