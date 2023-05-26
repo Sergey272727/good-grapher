@@ -6,8 +6,8 @@ export default {
     props: {
         plotterData: {
             default: {
-                x: [1, 2, 3, 4],
-                y: [-10, -15, -13, -17],
+                x: [],
+                y: [],
                 mode: "lines+markers",
                 line: {shape: "spline"},
                 type: "scatter"
@@ -17,8 +17,8 @@ export default {
     data() {
         return {
             data: [{
-                x: [1, 2, 3, 4],
-                y: [10, 15, 13, 17],
+                x: [],
+                y: [],
                 mode: "lines+markers",
                 line: {shape: "spline"},
                 type: "scatter"
