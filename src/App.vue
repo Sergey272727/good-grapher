@@ -8,11 +8,10 @@ export default {
     components: {CheckBoxList, Plotter, DropDown},
     data() {
         return {
-            points: [],
-            graphType: '',
+            userPointsData: [],
+            graphType: 'spline',
             graphDim: '2D',
-            checkedPlots: [],
-            fileNames: []
+            checkedPlots: []
         }
     },
     methods: {
@@ -26,11 +25,21 @@ export default {
         changePlotCheckBoxHandler(checkedPlots) {
             this.checkedPlots = checkedPlots;
         },
+        changeUserPointsDataHandler(elementToDelete) {
+            let indexToDelete = '';
+            this.userPointsData.forEach((value, index) => {
+                if (value.name === elementToDelete) {
+                    indexToDelete = index;
+                }
+            });
+            this.userPointsData.splice(indexToDelete, 1);
+
+        },
         simulateClickOnInput() {
             this.$refs['file-input'].click();
         },
         onInputChange() {
-            this.read3D();
+            this.readFile();
         },
         convertToMatrix(obj) {
             const minX = Math.min(...obj.x);
@@ -54,7 +63,7 @@ export default {
             }
             return matrix;
         },
-        read3D() {
+        readFile() {
             const reader = new FileReader();
             const pointInFile = this.$refs['file-input'].files[0];
             const mainDelimiter = '\r';
@@ -83,8 +92,15 @@ export default {
                         value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(0);
                     })
                     dataArray.name = pointInFile.name;
-                    this.points.push(dataArray);
-                    this.fileNames.push(pointInFile.name);
+                    let nenorm = false;
+                    this.userPointsData.forEach(value => {
+                        if (value.name === dataArray.name) {
+                            nenorm = true;
+                        }
+                    });
+                    if (!nenorm) {
+                        this.userPointsData.push(dataArray);
+                    }
                 }
             }
             this.$refs['file-input'].files = null;
@@ -93,7 +109,7 @@ export default {
     computed: {
         plotterData() {
             let plotsArray = [];
-            this.points.forEach(value => {
+            this.userPointsData.forEach(value => {
                 let go = false;
                 this.checkedPlots.forEach(plot => {
                     if (value.name === plot) {
@@ -223,6 +239,14 @@ export default {
                 }
             }
             return options;
+        },
+        fileNamesList() {
+            const fileNames = [];
+            this.userPointsData.forEach(value => {
+                fileNames.push(value.name);
+            });
+
+            return fileNames;
         }
     }
     ,
@@ -294,7 +318,7 @@ export default {
                             <input @change="onInputChange()" type="file" class="file-input" ref="file-input">
                         </button>
                         <div class="toolbar__upper-text">
-                            <check-box-list :checkBoxData="fileNames" @change-option="changePlotCheckBoxHandler"></check-box-list>
+                            <check-box-list :checkBoxData="fileNamesList" @delete-element="changeUserPointsDataHandler" @change-option="changePlotCheckBoxHandler"></check-box-list>
                         </div>
                     </div>
                     <div class="toolbar__lower">
