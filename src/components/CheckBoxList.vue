@@ -2,7 +2,8 @@
 export default {
     name: "CheckBoxList",
     emits: {
-        'change-option': null
+        'change-option': null,
+        'delete-element': null,
     },
     props: {
         checkBoxData: {
@@ -17,6 +18,9 @@ export default {
         }
     },
     methods: {
+        closeButtonHandler(elementToDelete) {
+            this.$emit('delete-element', elementToDelete);
+        },
         checkThisOption(option) {
             let res = false;
             this.checkedOptions.forEach((value) => {
@@ -46,6 +50,7 @@ export default {
                 <input class="checkbox" :value="option" type="checkbox" v-model="checkedOptions">
                 {{ option }}
             </label>
+            <button @click="closeButtonHandler(option)" class="close-button">X</button>
         </li>
     </ul>
 </template>
