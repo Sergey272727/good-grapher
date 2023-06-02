@@ -46,11 +46,18 @@ export default {
             class="checkbox-list__item no-select"
             :class="{'displayed': checkThisOption(option)}"
         >
-            <label>
-                <input class="checkbox" :value="option" type="checkbox" v-model="checkedOptions">
-                {{ option }}
-            </label>
-            <button @click="closeButtonHandler(option)" class="close-button">X</button>
+            <div class="checkbox-label">
+                <label>
+                    <input class="checkbox" :value="option" type="checkbox" v-model="checkedOptions">
+                    {{ option }}
+                </label>
+            </div>
+            <button @click="closeButtonHandler(option)" class="delete-button">
+                <svg class="delete-button__icon" width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23 2L2 22" :stroke="checkThisOption(option)? 'white' : 'black'" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M23 22L2 2" :stroke="checkThisOption(option)? 'white' : 'black'" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </button>
         </li>
     </ul>
 </template>
@@ -75,23 +82,40 @@ export default {
 .checkbox-list__item {
     margin: 0.5rem 0;
     padding: 0.5rem;
-    border-radius: 1.25rem;
+    border-radius: 1rem;
     background-color: #fff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    transition: box-shadow;
+
 }
 
 .displayed {
     color: #fff;
     background-color: #00A537;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
 .checkbox {
     display: none;
 }
 
-label {
+.checkbox-label {
 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+}
+.delete-button {
+    max-width: 46px;
+    background-color: inherit;
+    border: none;
+    border-radius: 1rem;
+}
+.delete-button__icon {
+    width: 34px;
+    height: 34px;
 }
 </style>

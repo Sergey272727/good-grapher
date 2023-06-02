@@ -20,7 +20,6 @@ export default {
         },
         changeGraphDimHandler(graphDim) {
             this.graphDim = graphDim;
-            this.$refs.graphTypeDropDown.selectedOption = this.$refs.graphTypeDropDown.options[0];
         },
         changePlotCheckBoxHandler(checkedPlots) {
             this.checkedPlots = checkedPlots;
@@ -33,13 +32,13 @@ export default {
                 }
             });
             this.userPointsData.splice(indexToDelete, 1);
-
         },
         simulateClickOnInput() {
             this.$refs['file-input'].click();
         },
         onInputChange() {
             this.readFile();
+            this.$refs['file-input'].value = '';
         },
         convertToMatrix(obj) {
             const minX = Math.min(...obj.x);
@@ -70,6 +69,7 @@ export default {
             const subDelimiter = ' ';
             const regExp = new RegExp(/\D /, 'g');
             let file = '';
+
             if (pointInFile) {
                 reader.readAsText(pointInFile);
                 reader.onload = () => {
@@ -92,18 +92,22 @@ export default {
                         value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(0);
                     })
                     dataArray.name = pointInFile.name;
-                    let nenorm = false;
-                    this.userPointsData.forEach(value => {
-                        if (value.name === dataArray.name) {
-                            nenorm = true;
-                        }
-                    });
-                    if (!nenorm) {
+                    if (this.userPointsData.length === 0) {
                         this.userPointsData.push(dataArray);
+                    }
+                    else {
+                        let nenorm = false;
+                        this.userPointsData.forEach(value => {
+                            if (value.name === dataArray.name) {
+                                nenorm = true;
+                            }
+                        });
+                        if (!nenorm) {
+                            this.userPointsData.push(dataArray);
+                        }
                     }
                 }
             }
-            this.$refs['file-input'].files = null;
         },
     },
     computed: {
@@ -318,7 +322,8 @@ export default {
                             <input @change="onInputChange()" type="file" class="file-input" ref="file-input">
                         </button>
                         <div class="toolbar__upper-text">
-                            <check-box-list :checkBoxData="fileNamesList" @delete-element="changeUserPointsDataHandler" @change-option="changePlotCheckBoxHandler"></check-box-list>
+                            <check-box-list :checkBoxData="fileNamesList" @delete-element="changeUserPointsDataHandler"
+                                            @change-option="changePlotCheckBoxHandler"></check-box-list>
                         </div>
                     </div>
                     <div class="toolbar__lower">
@@ -337,11 +342,11 @@ export default {
                                 :options="graphTypeOptions"
                                 @change-option="changeGraphTypeHandler"
                         ></drop-down>
-                        <div class="toolbar__lower-example">
-                            <div class="title">Пример графика</div>
-                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/line-plots.jpg"
-                                 alt="preview">
-                        </div>
+<!--                        <div class="toolbar__lower-example">-->
+<!--                            <div class="title">Пример графика</div>-->
+<!--                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/line-plots.jpg"-->
+<!--                                 alt="preview">-->
+<!--                        </div>-->
                     </div>
                 </div>
             </aside>
