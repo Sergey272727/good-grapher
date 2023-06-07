@@ -1,22 +1,17 @@
 <script>
-
-
 import Plotter from "@/components/Plotter.vue";
 import DropDown from "@/components/DropDown.vue";
+import CheckBoxList from "@/components/CheckBoxList.vue";
 
 export default {
     name: "App",
-    components: {Plotter, DropDown},
+    components: {CheckBoxList, Plotter, DropDown},
     data() {
         return {
-            points: {
-                x: [],
-                y: []
-            },
-            pointsArray: [],
-            graphType: '',
+            userPointsData: [],
+            graphType: 'spline',
             graphDim: '2D',
-            file: ''
+            checkedPlots: []
         }
     },
     methods: {
@@ -25,13 +20,25 @@ export default {
         },
         changeGraphDimHandler(graphDim) {
             this.graphDim = graphDim;
-            this.$refs.graphTypeDropDown.selectedOption = this.$refs.graphTypeDropDown.options[0];
+        },
+        changePlotCheckBoxHandler(checkedPlots) {
+            this.checkedPlots = checkedPlots;
+        },
+        changeUserPointsDataHandler(elementToDelete) {
+            let indexToDelete = '';
+            this.userPointsData.forEach((value, index) => {
+                if (value.name === elementToDelete) {
+                    indexToDelete = index;
+                }
+            });
+            this.userPointsData.splice(indexToDelete, 1);
         },
         simulateClickOnInput() {
             this.$refs['file-input'].click();
         },
         onInputChange() {
-            this.read3D();
+            this.readFile();
+            this.$refs['file-input'].value = '';
         },
         convertToMatrix(obj) {
             const minX = Math.min(...obj.x);
@@ -55,14 +62,14 @@ export default {
             }
             return matrix;
         },
-        read3D() {
+        readFile() {
             const reader = new FileReader();
             const pointInFile = this.$refs['file-input'].files[0];
-            this.file = pointInFile.name;
             const mainDelimiter = '\r';
             const subDelimiter = ' ';
             const regExp = new RegExp(/\D /, 'g');
             let file = '';
+
             if (pointInFile) {
                 reader.readAsText(pointInFile);
                 reader.onload = () => {
@@ -71,10 +78,9 @@ export default {
                     file = file.replaceAll(',', '.');
                     let pointsArray = file.split(mainDelimiter);
                     pointsArray = pointsArray.map(stroke => stroke.split(subDelimiter).map(str => +str));
-                    if(!pointsArray[pointsArray.length - 1][0]) {
+                    if (!pointsArray[pointsArray.length - 1][0]) {
                         pointsArray.pop();
                     }
-                    this.pointsArray = pointsArray;
                     let dataArray = {
                         x: [],
                         y: [],
@@ -85,99 +91,124 @@ export default {
                         value[1] ? dataArray.y.push(value[1]) : dataArray.y.push(0);
                         value[2] ? dataArray.z.push(value[2]) : dataArray.z.push(0);
                     })
-                    this.points = dataArray;
+                    dataArray.name = pointInFile.name;
+                    if (this.userPointsData.length === 0) {
+                        this.userPointsData.push(dataArray);
+                    }
+                    else {
+                        let nenorm = false;
+                        this.userPointsData.forEach(value => {
+                            if (value.name === dataArray.name) {
+                                nenorm = true;
+                            }
+                        });
+                        if (!nenorm) {
+                            this.userPointsData.push(dataArray);
+                        }
+                    }
                 }
             }
-        }
-        ,
+        },
     },
     computed: {
         plotterData() {
-            let data = {};
-            if (this.graphDim === '2D') {
-                data.x = this.points.x;
-                data.y = this.points.y;
-            } else if (this.graphDim === '3D') {
-                data.x = this.points.x;
-                data.y = this.points.y;
-                data.z = this.points.z;
-            }
-            switch (this.graphType) {
-                case 'scatter': {
-                    data.mode = "markers";
-                    data.type = "scatter";
-                    data.marker = {size: 12};
-                    break;
+            let plotsArray = [];
+            this.userPointsData.forEach(value => {
+                let go = false;
+                this.checkedPlots.forEach(plot => {
+                    if (value.name === plot) {
+                        go = true;
+                    }
+                });
+                if (go) {
+                    let data = {};
+                    if (this.graphDim === '2D') {
+                        data.x = value.x;
+                        data.y = value.y;
+                    } else if (this.graphDim === '3D') {
+                        data.x = value.x;
+                        data.y = value.y;
+                        data.z = value.z;
+                    }
+                    switch (this.graphType) {
+                        case 'scatter': {
+                            data.mode = "markers";
+                            data.type = "scatter";
+                            data.marker = {size: 12};
+                            break;
+                        }
+                        case 'line': {
+                            data.mode = "lines+markers";
+                            data.type = "scatter";
+                            break;
+                        }
+                        case 'bar': {
+                            data.type = "bar";
+                            break;
+                        }
+                        case "spline": {
+                            data.mode = "lines+markers";
+                            data.line = {shape: "spline"};
+                            data.type = "scatter";
+                            break;
+                        }
+                        case "scatter3d": {
+                            data.mode = "markers";
+                            data.marker = {
+                                size: 12,
+                                line: {
+                                    color: 'rgba(217, 217, 217, 0.14)',
+                                    width: 0.5
+                                },
+                                opacity: 0.8
+                            };
+                            data.type = 'scatter3d';
+                            break;
+                        }
+                        case "countour": {
+                            data.type = 'contour';
+                            break;
+                        }
+                        case "mesh3d": {
+                            data.type = 'mesh3d';
+                            data.opacity = 0.8;
+                            data.color = 'rgb(300,100,200)';
+                            break;
+                        }
+                        case "line3d": {
+                            data.type = 'scatter3d';
+                            data.mode = 'lines';
+                            data.opacity = 1;
+                            data.line = {
+                                width: 6,
+                                reversescale: false
+                            };
+                            break;
+                        }
+                        case 'hm': {
+                            data.z = this.convertToMatrix(data);
+                            data.x = [...new Set(data.x)];
+                            data.y = [...new Set(data.y)];
+                            data.type = 'heatmap';
+                            break;
+                        }
+                        case 'surface': {
+                            data.z = this.convertToMatrix(data);
+                            data.x = [...new Set(data.x)];
+                            data.y = [...new Set(data.y)];
+                            data.type = 'surface';
+                            break;
+                        }
+                        default: {
+                            data.mode = "lines+markers";
+                            data.line = {shape: "spline"};
+                            data.type = "scatter";
+                        }
+                    }
+                    plotsArray.push(data);
                 }
-                case 'line': {
-                    data.mode = "lines+markers";
-                    data.type = "scatter";
-                    break;
-                }
-                case 'bar': {
-                    data.type = "bar";
-                    break;
-                }
-                case "spline": {
-                    data.mode = "lines+markers";
-                    data.line = {shape: "spline"};
-                    data.type = "scatter";
-                    break;
-                }
-                case "scatter3d": {
-                    data.mode = "markers";
-                    data.marker = {
-                        size: 12,
-                        line: {
-                            color: 'rgba(217, 217, 217, 0.14)',
-                            width: 0.5
-                        },
-                        opacity: 0.8
-                    };
-                    data.type = 'scatter3d';
-                    break;
-                }
-                case "countour": {
-                    data.type = 'contour';
-                    break;
-                }
-                case "mesh3d": {
-                    data.type = 'mesh3d';
-                    data.opacity = 0.8;
-                    data.color = 'rgb(300,100,200)';
-                    break;
-                }
-                case "line3d": {
-                    data.type = 'scatter3d';
-                    data.mode = 'lines';
-                    data.opacity = 1;
-                    data.line = {
-                        width: 6,
-                        reversescale: false
-                    };
-                    break;
-                }
-                case 'hm': {
-                    data.z = this.convertToMatrix(data);
-                    data.x = [...new Set(data.x)];
-                    data.y = [...new Set(data.y)];
-                    data.type = 'heatmap';
-                    break;
-                }
-                case 'surface': {
-                    data.z = this.convertToMatrix(data);
-                    data.x = [...new Set(data.x)];
-                    data.y = [...new Set(data.y)];
-                    data.type = 'surface';
-                    break;
-                }
-                default: {
-                    data.mode = "lines+markers";
-                    data.line = {shape: "spline"};
-                    data.type = "scatter";
-                }
-            }
-            return data;
+            });
+            return plotsArray;
         },
         graphTypeOptions() {
             let options = [];
@@ -212,6 +243,14 @@ export default {
                 }
             }
             return options;
+        },
+        fileNamesList() {
+            const fileNames = [];
+            this.userPointsData.forEach(value => {
+                fileNames.push(value.name);
+            });
+
+            return fileNames;
         }
     }
     ,
@@ -266,7 +305,6 @@ export default {
     }
 }
 </script>
-
 <template>
     <div class="wrapper">
         <div class="content">
@@ -284,29 +322,31 @@ export default {
                             <input @change="onInputChange()" type="file" class="file-input" ref="file-input">
                         </button>
                         <div class="toolbar__upper-text">
-                            {{ file }}
+                            <check-box-list :checkBoxData="fileNamesList" @delete-element="changeUserPointsDataHandler"
+                                            @change-option="changePlotCheckBoxHandler"></check-box-list>
                         </div>
                     </div>
                     <div class="toolbar__lower">
                         <drop-down
-                            class="dropdown-button"
-                            element-name="Размерность"
-                            :options="[
+                                class="dropdown-button"
+                                element-name="Размерность"
+                                :options="[
                                 {key: '2D', name: 'Двумерный график'},
                                 {key: '3D', name: 'Трехмерный график'},
                             ]"
-                            @change-option="changeGraphDimHandler"
+                                @change-option="changeGraphDimHandler"
                         ></drop-down>
                         <drop-down
-                            ref="graphTypeDropDown"
-                            element-name="Тип графика"
-                            :options="graphTypeOptions"
-                            @change-option="changeGraphTypeHandler"
+                                ref="graphTypeDropDown"
+                                element-name="Тип графика"
+                                :options="graphTypeOptions"
+                                @change-option="changeGraphTypeHandler"
                         ></drop-down>
-                        <div class="toolbar__lower-example">
-                            <div class="title">Пример графика</div>
-                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/line-plots.jpg" alt="preview">
-                        </div>
+<!--                        <div class="toolbar__lower-example">-->
+<!--                            <div class="title">Пример графика</div>-->
+<!--                            <img ref="exampleImage" class="graph-example__image" src="src/assets/img/line-plots.jpg"-->
+<!--                                 alt="preview">-->
+<!--                        </div>-->
                     </div>
                 </div>
             </aside>
@@ -437,6 +477,7 @@ export default {
     width: 100%;
     border-radius: 1.25rem;
 }
+
 .dropdown-button {
     margin-bottom: 3rem;
 }
