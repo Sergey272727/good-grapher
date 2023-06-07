@@ -1,14 +1,6 @@
 # good_grapher
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin). But I just used WebStorm.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+It is the cross-platforming web application for data visualising and analysing. I used Vue and Plotly for this project. It`s my degree work.
 
 ## Project Setup
 
@@ -22,8 +14,3 @@ npm install
 npm run dev
 ```
 
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
